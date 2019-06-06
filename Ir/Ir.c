@@ -24,25 +24,41 @@ struct node* newNode(int data) {
 
 struct graph* newGraph(int size) {
   struct graph *g = (struct graph *) malloc (sizeof(struct graph));
+  g->size = size;
+
   g->lista_adj = (struct lista *) malloc (size * sizeof(struct lista));
+
+  for (int i = 0; i < size; i++)
+    g->lista_adj[i].n = NULL;
+
   return g;
 }
 
 void newConn(int u, int v, struct graph *g) {
-  struct node* n = newNode(v);
-  n->prox = g->lista_adj[u].n;
-  g->lista_adj[u].n = n;
+  struct node* n = newNode(v - 1);
+  n->prox = g->lista_adj[u - 1].n;
+  g->lista_adj[u - 1].n = n;
 }
 
-void depthFirst(int V, graph *g) {
-  int visitado[V];
-  for (int i = 0; i < V; v++)
+int allVisited(struct graph *g) {
+  int visitado[g->size];
+  for (int i = 0; i < g->size; i++)
     visitado[i] = 0;
 
-  for (int i = 0; i < V; i++) {
-    for (int j = )
-      visitado[g->lista_adj[v]->n->data] = 1;
+  for (int i = 0; i < g->size; i++) {
+    struct node* perc = g->lista_adj[i].n;
+
+    while(perc) {
+      visitado[perc->data] = 1;
+      perc = perc->prox;
+    }
   }
+
+  for (int i = 0; i < g->size; i++) {
+    if (visitado[i] == 0)
+      return 0;
+  }
+  return 1;
 
 }
 
@@ -67,6 +83,8 @@ int main() {
         newConn(w, v, g);
       }
     }
+
+    printf("%d\n", allVisited(g));
 
   }
 }
