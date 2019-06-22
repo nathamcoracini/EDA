@@ -7,13 +7,12 @@ struct node {
 };
 
 struct lista {
-  struct node *n;
+  struct node *n; //no cabeca
 };
 
 struct graph {
   int size; //numero de vertices
   struct lista *lista_adj;
-  int *visited;
 };
 
 struct node* newNode(int data) {
@@ -25,54 +24,61 @@ struct node* newNode(int data) {
 
 struct graph* newGraph(int size) {
   struct graph *g = (struct graph *) malloc (sizeof(struct graph));
-  g->visited = (int *) malloc (size * sizeof(int));
   g->size = size;
   g->lista_adj = (struct lista *) malloc (size * sizeof(struct lista));
 
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++)
     g->lista_adj[i].n = NULL;
-    g->visited = 0;
-  }
 
   return g;
 }
 
-void buscaProfundidade(struct graph *g, int v) {
-  struct node* perc = g->lista_adj[v].n;
-  g->visited[v] = 1;
+//funcao para busca em profundidade
+void buscaProfundidadeRecur(struct graph *g, int n, int *visited) {
+  struct node* perc = g->lista_adj[n].n;
+  visited[n] = 1;
 
   while(perc) {
-    if(!g->visited[perc->data])
-      buscaProfundidade(g, perc->data);
+    if (visited[perc->data] == 0)
+      buscaProfundidadeRecur(g, perc->data, visited);
+    perc = perc->prox;
   }
 }
 
+//funcao para checar se o grafo e fortemente conexo
+int strongConnected(struct graph *g, struct graph *g_transp, int n, int *visited) {
+  visited = (int *) malloc (sizeof(int) * g->size);
+
+  for (int i = 0; i < g->size; i++)
+    visited[i] = 0;
+
+  buscaProfundidadeRecur(g, n, visited);
+
+  for (int i = 0; i < g->size; i++)
+    if (visited[i] == 0)
+      return 0;
+
+  for (int i = 0; i < g->size; i++)
+    visited[i] = 0;
+
+  buscaProfundidadeRecur(g_transp, n, visited);
+
+  for (int i = 0; i < g->size; i++)
+    if (visited[i] == 0)
+      return 0;
+
+  return 1;
+}
+
+//cria nova conexao no grafo
 void newConn(int u, int v, struct graph *g) {
-  struct node* n = newNode(v - 1);
+  struct node* n = newNode(v - 1); //-1 pois os numeros vao de 1 a n na main
   n->prox = g->lista_adj[u - 1].n;
   g->lista_adj[u - 1].n = n;
 }
 
-int fortConnected(struct graph *g, struct graph *g_transp) {
-  buscaProfundidade(g, g->lista_adj[0].n->data);
-
-  for (int i = 0; i < g->size; i++) {
-    if (g->visited[i] == 0)
-      return 0;
-  }
-
-  buscaProfundidade(g_transp, g_transp->lista_adj[0].n->data);
-
-  for (int i = 0; i < g_transp->size; i++) {
-    if (g_transp->visited[i] == 0)
-      return 0;
-  }
-  return 1;
-
-}
-
 int main() {
-  int ruas, intersec;
+  int ruas, intersec, *visited;
 
   while (1) {
     scanf("%d%d", &intersec, &ruas);
@@ -97,7 +103,7 @@ int main() {
       }
     }
 
-    printf("%d\n", fortConnected(g, g_transp));
+    printf("%d\n", strongConnected(g, g_transp, 0, visited));
 
   }
 }

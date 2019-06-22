@@ -6,7 +6,6 @@ typedef int T;
 struct node {
   struct node *esq, *dir;
   T data;
-  int bal;
 };
 
 struct node *init (T data) {
@@ -16,110 +15,18 @@ struct node *init (T data) {
   return newNode;
 }
 
-struct node* rotEE(struct node *node) {
-  struct node *p = node->esq;
-  node->esq = p->dir;
-  p->dir = node->esq;
-
-  node->bal = 0;
-  p->bal = 0;
-
-  return p;
-}
-
-struct node* rotDD(struct node *node) {
-  struct node *p = node->dir;
-  node->dir = p->esq;
-  p->esq = node->dir;
-
-  node->bal = 0;
-  p->bal = 0;
-
-  return p;
-}
-
-struct node* rotED(struct node *node) {
-  struct node *p = node->esq;
-  struct node *t = p->dir;
-  p->dir = t->esq;
-  t->esq = p;
-  node ->esq = t->dir;
-  t->dir = node;
-
-  if(t->bal == -1) {
-    node->bal = 1;
-    p->bal = 0;
-    t->bal = 0;
-  }
-  else if(t->bal == 1) {
-    node->bal = 0;
-    p->bal = -1;
-    t->bal = 0;
-  }
-  else {
-    node->bal = 0;
-    p->bal = 0;
-  }
-  return t;
-}
-
-struct node* rotDE(struct node *node) {
-  struct node *p = node->dir;
-  struct node *t = p->esq;
-  p->esq = t->dir;
-  t->dir = p;
-  node->dir = t->esq;
-  t->esq = node;
-
-  if(t->bal == -1) {
-    node->bal = 0;
-    p->bal = 1;
-    t->bal = 0;
-  }
-  else if(t->bal == 1) {
-    node->bal = -1;
-    p->bal = 0;
-    t->bal = 0;
-  }
-  else {
-    node->bal = 0;
-    p->bal = 0;
-  }
-  return t;
-}
-
 struct node *insert(struct node *node, T data) {
 
   if (node == NULL) {
     node = init(data);
     return node;
   }
-
-  //insere normalmente
   if (data < node->data)
     node->esq = insert(node->esq, data);
   else if (data > node->data)
     node->dir = insert(node->dir, data);
-  else
-    return node;
 
-    //RR e LR
-    if (node->bal > 1) {
-      if (data < node->esq->data)
-        return rotDD(node);
-      else if (data > node->esq->data)
-        return rotED(node);
-    }
-
-    //LL e RL
-    if (node->bal < -1) {
-      if (data > node->dir->data)
-        return rotEE(node);
-      else if (data < node->dir->data)
-        return rotDE(node);
-    }
-
-    return node;
+  return node;
 }
 
 void destroy_tree(struct node* node) {
