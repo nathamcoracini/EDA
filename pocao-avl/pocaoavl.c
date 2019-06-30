@@ -13,7 +13,20 @@ struct node *init (T data) {
   struct node* newNode = (struct node*) malloc (sizeof(struct node));
   newNode->esq = newNode->dir = NULL;
   newNode->data = data;
+  newNode->bal = 0;
   return newNode;
+}
+
+int altura(struct node* node) {
+  if (node == NULL)
+    return -1;
+
+  int lAltura = altura(node->esq);
+  int rAltura = altura(node->dir);
+
+  if (lAltura > rAltura)
+    return(lAltura + 1);
+  else return(rAltura + 1);
 }
 
 struct node* rotEE(struct node *node) {
@@ -104,20 +117,20 @@ struct node *insert(struct node *node, T data) {
     return node;
 
     //RR e LR
-    if (node->bal > 1) {
-      if (data < node->esq->data)
-        return rotDD(node);
-      else if (data > node->esq->data)
-        return rotED(node);
-    }
+  if (node->bal > 1) {
+    if (data < node->esq->data)
+      return rotDD(node);
+    else if (data > node->esq->data)
+      return rotED(node);
+  }
 
     //LL e RL
-    if (node->bal < -1) {
-      if (data > node->dir->data)
-        return rotEE(node);
-      else if (data < node->dir->data)
-        return rotDE(node);
-    }
+  if (node->bal < -1) {
+    if (data > node->dir->data)
+      return rotEE(node);
+    else if (data < node->dir->data)
+      return rotDE(node);
+  }
 
     return node;
 }
@@ -173,7 +186,7 @@ int main() {
 
   struct node* pocoes = NULL;
   struct node* embalagens = NULL;
-  int garrafas[1000];
+  int garrafas[100000];
 
   int p;
   scanf("%d", &p);
